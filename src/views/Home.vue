@@ -9,7 +9,7 @@
     </div>
     <div id="list">
       <ul>
-        <li v-for="obj in objects" :key="obj.id">
+        <li v-for="obj in $store.state.list" :key="obj.id">
           <ObjectItem :item="obj" />
         </li>
       </ul>
@@ -53,16 +53,31 @@ export default Vue.extend({
     ObjectItem
   },
   mounted() {
-    axios
-      .get(
-        `https://api.nasa.gov/neo/rest/v1/feed?start_date=${curday(
-          "-"
-        )}&end_date=${curday("-")}&api_key=${API_KEY}`
-      )
-      .then(
-        response =>
-          (this.objects = response.data.near_earth_objects[curday("-")])
-      );
+    const d = new Date().getTime();
+    const date = new Date(d).toLocaleDateString();
+    if (this.$store.state.time == 0) {
+      this.$store.commit("updateTime", date);
+      this.getObjects();
+    } else if (this.$store.state.time != date) {
+      this.$store.commit("updateTime", date);
+      this.getObjects();
+    }
+  },
+  methods: {
+    getObjects() {
+      axios
+        .get(
+          `https://api.nasa.gov/neo/rest/v1/feed?start_date=${curday(
+            "-"
+          )}&end_date=${curday("-")}&api_key=${API_KEY}`
+        )
+        .then(response =>
+          this.$store.commit(
+            "updateList",
+            response.data.near_earth_objects[curday("-")]
+          )
+        );
+    }
   }
 });
 </script>
