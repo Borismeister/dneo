@@ -10,7 +10,7 @@
 import Vue from "vue";
 export default Vue.extend({
   metaInfo: {
-    title: "DNEO - About"
+    title: "DNEOS - About"
   }
 });
 </script>
